@@ -99,15 +99,8 @@ jobs:
           
       - name: Build AtomSpace
         run: |
-          cd orc-as/atomspace
-          # Create missing lib directory if it doesn't exist
-          if [ ! -d "lib" ]; then
-            mkdir -p lib
-            echo "# Empty lib directory for build compatibility" > lib/CMakeLists.txt
-          fi
-          mkdir -p build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
-          make -j$(nproc)
+          # Use network-resilient build script to handle Haskell connectivity issues
+          ./.github/scripts/network_resilient_atomspace_build.sh orc-as/atomspace
           
       - name: Test AtomSpace
         run: |
