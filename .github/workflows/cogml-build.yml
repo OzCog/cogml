@@ -42,6 +42,8 @@ jobs:
             timeout 600s sudo apt-get install -y --no-install-recommends libboost-all-dev python3-nose python3-dev || echo "Dev tools install had issues"
             timeout 300s sudo apt-get install -y --no-install-recommends valgrind doxygen || echo "Optional tools install had issues"
           fi
+          
+      - name: Build cogutil
         run: |
           cd orc-dv/cogutil
           mkdir -p build && cd build
