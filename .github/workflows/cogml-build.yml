@@ -25,23 +25,19 @@ jobs:
         with:
           fetch-depth: 0  # Fetch full git history for versioning
       
-      - name: Setup build environment
+      - name: Setup build environment and fix directories
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          
-      - name: Install dependencies (optimized)
+      
+      - name: Fix missing lib directories
         run: |
-          # Use faster package manager alternatives when possible to avoid timeouts
-          if command -v apt-fast &> /dev/null; then
-            sudo apt-fast update && sudo apt-fast install -y build-essential cmake libboost-all-dev python3-nose python3-dev valgrind doxygen
-          else
-            # Reduce timeout risk with targeted package installation and shorter timeout
-            timeout 300s sudo apt-get update -q || echo "Update timed out, continuing..."
-            timeout 600s sudo apt-get install -y --no-install-recommends build-essential cmake || echo "Basic tools install had issues"
-            timeout 600s sudo apt-get install -y --no-install-recommends libboost-all-dev python3-nose python3-dev || echo "Dev tools install had issues"
-            timeout 300s sudo apt-get install -y --no-install-recommends valgrind doxygen || echo "Optional tools install had issues"
-          fi
+          ./.github/scripts/fix-lib-directories.sh
+          
+      - name: Install dependencies (resilient)
+        run: |
+          # Use improved dependency installation script with better error handling
+          ./.github/scripts/install-deps.sh basic
           
       - name: Build cogutil
         run: |
@@ -97,10 +93,10 @@ jobs:
           sudo make install
           sudo ldconfig
           
-      - name: Build AtomSpace
+      - name: Fix missing lib directories and build AtomSpace
         run: |
           cd orc-as/atomspace
-          # Create missing lib directory if it doesn't exist
+          # Ensure lib directory exists (this was causing build failures)
           if [ ! -d "lib" ]; then
             mkdir -p lib
             echo "# Empty lib directory for build compatibility" > lib/CMakeLists.txt
@@ -970,7 +966,7 @@ jobs:
             echo "❌ MOSES build failed, activating self-healing..."
 
             # Check if auto-fix is enabled and available
-            if [ "$COGML_AUTO_FIX_ENABLED" = "true" ] && [ -f "../../scripts/auto_fix.py" ]; then
+            if [ "$COGML_AUTO_FIX_ENABLED" = "true" ] && [ -f "../../../scripts/auto_fix.py" ]; then
               echo "🤖 Running self-healing auto-fix system..."
               cd ../../..
 
