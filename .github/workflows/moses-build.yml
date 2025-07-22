@@ -48,6 +48,19 @@ jobs:
           sudo apt-get install -y -q libboost-all-dev
           sudo apt-get install -y -q python3-nose valgrind doxygen
 
+      - name: Build CogUtil
+        run: |
+          cd orc-dv/cogutil
+          mkdir -p build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+          make -j$(nproc)
+
+      - name: Install CogUtil
+        run: |
+          cd orc-dv/cogutil/build
+          sudo make install
+          sudo ldconfig
+
       - name: Build Moses
         run: |
           cd orc-ai/moses
