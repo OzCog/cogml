@@ -242,6 +242,90 @@ IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/gnucashcog-v3/CMakeLists.txt")
 ENDIF()
 
 # ===================================================================
+# CPack Configuration for Package Generation
+# ===================================================================
+
+# CPack meta-information
+SET(CPACK_PACKAGE_NAME "cogml")
+SET(CPACK_PACKAGE_VERSION "1.0.0")
+SET(CPACK_PACKAGE_VENDOR "OpenCog Foundation")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CogML - Cognitive Machine Learning Framework")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+SET(CPACK_PACKAGE_CONTACT "cogml-dev@opencog.org")
+
+# Package generators - supporting multiple formats as requested
+SET(CPACK_GENERATOR "TGZ;ZIP")
+
+# Debian package specific settings
+IF(UNIX AND NOT APPLE)
+    LIST(APPEND CPACK_GENERATOR "DEB")
+    SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "OpenCog Foundation")
+    SET(CPACK_DEBIAN_PACKAGE_SECTION "science")
+    SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-all-dev (>= 1.60), cmake (>= 3.16)")
+ENDIF()
+
+# Source package configuration
+SET(CPACK_SOURCE_GENERATOR "TGZ;ZIP")
+SET(CPACK_SOURCE_IGNORE_FILES
+    "/\\\\.git/"
+    "/build/"
+    "/\\\\.gitignore"
+    "/\\\\.github/"
+    "\\\\.swp$"
+    "\\\\.orig$"
+    "/CMakeLists\\\\.txt\\\\.user"
+    "/private/"
+)
+
+# Component-based packaging for modular installation
+SET(CPACK_COMPONENTS_ALL foundation core ai robotics web docs)
+
+# Foundation layer components  
+SET(CPACK_COMPONENT_FOUNDATION_DISPLAY_NAME "Foundation Layer")
+SET(CPACK_COMPONENT_FOUNDATION_DESCRIPTION "Core utilities and base OpenCog infrastructure")
+SET(CPACK_COMPONENT_FOUNDATION_GROUP "Base")
+
+# Core layer components
+SET(CPACK_COMPONENT_CORE_DISPLAY_NAME "Core Layer") 
+SET(CPACK_COMPONENT_CORE_DESCRIPTION "AtomSpace and core reasoning components")
+SET(CPACK_COMPONENT_CORE_GROUP "Base")
+SET(CPACK_COMPONENT_CORE_DEPENDS foundation)
+
+# AI layer components
+SET(CPACK_COMPONENT_AI_DISPLAY_NAME "AI Layer")
+SET(CPACK_COMPONENT_AI_DESCRIPTION "Learning, reasoning, and evolutionary algorithms")
+SET(CPACK_COMPONENT_AI_GROUP "Intelligence")
+SET(CPACK_COMPONENT_AI_DEPENDS core)
+
+# Robotics components
+SET(CPACK_COMPONENT_ROBOTICS_DISPLAY_NAME "Robotics Layer")
+SET(CPACK_COMPONENT_ROBOTICS_DESCRIPTION "Embodied cognition and robotics integration")
+SET(CPACK_COMPONENT_ROBOTICS_GROUP "Applications")
+SET(CPACK_COMPONENT_ROBOTICS_DEPENDS ai)
+
+# Web components
+SET(CPACK_COMPONENT_WEB_DISPLAY_NAME "Web Layer")
+SET(CPACK_COMPONENT_WEB_DESCRIPTION "RESTful APIs and web interfaces")
+SET(CPACK_COMPONENT_WEB_GROUP "Applications") 
+SET(CPACK_COMPONENT_WEB_DEPENDS core)
+
+# Documentation
+SET(CPACK_COMPONENT_DOCS_DISPLAY_NAME "Documentation")
+SET(CPACK_COMPONENT_DOCS_DESCRIPTION "API documentation and user guides")
+SET(CPACK_COMPONENT_DOCS_GROUP "Documentation")
+
+# Component groups
+SET(CPACK_COMPONENT_GROUP_BASE_DESCRIPTION "Essential OpenCog components")
+SET(CPACK_COMPONENT_GROUP_INTELLIGENCE_DESCRIPTION "AI and learning components")
+SET(CPACK_COMPONENT_GROUP_APPLICATIONS_DESCRIPTION "Application-specific components")
+SET(CPACK_COMPONENT_GROUP_DOCUMENTATION_DESCRIPTION "Documentation and examples")
+
+# Include CPack module to enable packaging
+INCLUDE(CPack)
+
+# ===================================================================
 # Show a summary of what was built
 
 MESSAGE(STATUS "")
@@ -252,5 +336,6 @@ MESSAGE(STATUS "All available OpenCog components have been configured.")
 MESSAGE(STATUS "Components will be built in dependency order.")
 MESSAGE(STATUS "Use 'make' to build all components.")
 MESSAGE(STATUS "Use 'make install' to install all components.")
+MESSAGE(STATUS "Use 'cpack' to generate distribution packages.")
 MESSAGE(STATUS "========================================")
 MESSAGE(STATUS "")
