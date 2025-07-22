@@ -42,8 +42,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential cmake libboost-all-dev python3-nose valgrind doxygen
+          # Install packages in smaller chunks to prevent timeout
+          sudo apt-get update -q
+          sudo apt-get install -y -q build-essential cmake
+          sudo apt-get install -y -q libboost-all-dev
+          sudo apt-get install -y -q python3-nose valgrind doxygen
 
       - name: Build Moses
         run: |
