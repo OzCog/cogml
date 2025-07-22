@@ -42,6 +42,8 @@ jobs:
             timeout 600s sudo apt-get install -y --no-install-recommends libboost-all-dev python3-nose python3-dev || echo "Dev tools install had issues"
             timeout 300s sudo apt-get install -y --no-install-recommends valgrind doxygen || echo "Optional tools install had issues"
           fi
+          
+      - name: Build cogutil
         run: |
           cd orc-dv/cogutil
           mkdir -p build && cd build
@@ -556,8 +558,10 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/opencog/unify /tmp/unify
           cd /tmp/unify
+          # Fix cmake module paths
+          sed -i 's|\${ATOMSPACE_DATA_DIR}/cmake|/usr/local/share/opencog/cmake|g' CMakeLists.txt
           mkdir -p build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DATOMSPACE_DATA_DIR=/usr/local/share/opencog
           make -j$(nproc)
           sudo make install
           sudo ldconfig
@@ -566,7 +570,7 @@ jobs:
         run: |
           cd orc-ai/ure
           mkdir -p build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE=$(which python3)
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE=$(which python3) -DATOMSPACE_DATA_DIR=/usr/local/share/opencog
           make -j$(nproc)
           
       - name: Test URE
@@ -1295,7 +1299,7 @@ jobs:
         run: |
           cd orc-sv/cogserver
           mkdir -p build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DATOMSPACE_DATA_DIR=/usr/local/share/opencog
           make -j$(nproc)
           sudo make install
           sudo ldconfig
@@ -1397,7 +1401,7 @@ jobs:
             mkdir -p build
           fi
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DATOMSPACE_DATA_DIR=/usr/local/share/opencog
           make -j$(nproc)
           sudo make install
           sudo ldconfig

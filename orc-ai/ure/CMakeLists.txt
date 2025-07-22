@@ -188,9 +188,9 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR} ${Boost_INCLUDE_DIRS}
 	${COGUTIL_INCLUDE_DIR} ${ATOMSPACE_INCLUDE_DIR})
 
 # Macros that define how atom types get declared.
-INCLUDE("${ATOMSPACE_DATA_DIR}/cmake/OpenCogMacros.cmake")
-INCLUDE("${ATOMSPACE_DATA_DIR}/cmake/OpenCogGuile.cmake")
-INCLUDE("${ATOMSPACE_DATA_DIR}/cmake/OpenCogCython.cmake")
+INCLUDE("/usr/local/share/opencog/cmake/OpenCogMacros.cmake")
+INCLUDE("/usr/local/share/opencog/cmake/OpenCogGuile.cmake")
+INCLUDE("/usr/local/share/opencog/cmake/OpenCogCython.cmake")
 
 # ==========================================================
 # Decide what to build, based on the packages found.
