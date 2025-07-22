@@ -192,6 +192,10 @@ INCLUDE("/usr/local/share/opencog/cmake/OpenCogMacros.cmake")
 INCLUDE("/usr/local/share/opencog/cmake/OpenCogGuile.cmake")
 INCLUDE("/usr/local/share/opencog/cmake/OpenCogCython.cmake")
 
+# Set paths for atom type generation
+SET(OC_CMAKE_PATH "/usr/local/share/opencog")
+SET(OC_ATOM_TYPES_PATH "/usr/local/share/opencog/cmake/OpenCogGenWrapper.cmake")
+
 # ==========================================================
 # Decide what to build, based on the packages found.
 

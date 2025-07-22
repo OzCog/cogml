@@ -152,8 +152,12 @@ ENDIF (ATOMSPACE_FOUND)
 #	SET (ATOMSPACE_DATA_DIR "${COGUTIL_DATA_DIR}")
 #ENDIF (NOT DEFINED ATOMSPACE_DATA_DIR)
 
-INCLUDE("${ATOMSPACE_DATA_DIR}/cmake/OpenCogMacros.cmake")
-INCLUDE("${ATOMSPACE_DATA_DIR}/cmake/OpenCogFunctions.cmake")
+INCLUDE("/usr/local/share/opencog/cmake/OpenCogMacros.cmake")
+INCLUDE("/usr/local/share/opencog/cmake/OpenCogFunctions.cmake")
+
+# Set paths for atom type generation
+SET(OC_CMAKE_PATH "/usr/local/share/opencog")
+SET(OC_ATOM_TYPES_PATH "/usr/local/share/opencog/cmake/OpenCogGenWrapper.cmake")
 
 # ----------------------------------------------------------
 # MPI is needed for MOSES on compute clusters.
@@ -205,8 +209,8 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR} ${Boost_INCLUDE_DIRS}
 	${COGUTIL_INCLUDE_DIR})
 
 # Macros
-INCLUDE("${ATOMSPACE_DATA_DIR}/cmake/OpenCogMacros.cmake")
-INCLUDE("${ATOMSPACE_DATA_DIR}/cmake/OpenCogFunctions.cmake")
+INCLUDE("/usr/local/share/opencog/cmake/OpenCogMacros.cmake")
+INCLUDE("/usr/local/share/opencog/cmake/OpenCogFunctions.cmake")
 
 # -------------------------------------------------
 # Library configuration
