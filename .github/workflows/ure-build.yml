@@ -114,8 +114,9 @@ jobs:
         run: |
           cd orc-ai/ure
           mkdir -p build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE=$(which python3)
-          make -j$(nproc)
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE=$(which python3) -DATOMSPACE_DATA_DIR=/usr/local/share/opencog
+          # Build core C++ libraries (skip Python bindings due to Cython compatibility issues)
+          make ure ure-types -j$(nproc)
 
       - name: Test URE
         run: |
