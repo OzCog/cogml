@@ -1,7 +1,9 @@
 name: Build-Test-Package
 
 permissions:
-  contents: read
+  contents: write  # Need write permission for releases
+  actions: read
+  pull-requests: read
 
 on:
   push:
@@ -216,3 +218,48 @@ jobs:
         with:
           path: /ws/ccache
           key: ccache-${{ hashFiles('/tmp/date') }}
+
+      # New: Run CPack to Package All Artifacts
+      - name: Run CPack to Package All Artifacts
+        run: |
+          cd /ws/opencog/build
+          cpack
+
+      # New: Generate Scheme Hypergraph Package
+      - name: Generate Scheme Hypergraph Package
+        run: |
+          cd /ws/opencog
+          mkdir -p release
+          # Install Guile if not available
+          if ! command -v guile &> /dev/null; then
+            apt-get update && apt-get install -y guile-3.0
+          fi
+          # Run the Scheme packaging script
+          guile -s pack-cogml.scm release
+
+      # New: Upload Package Artifacts
+      - name: Upload Package Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cogml-artifacts
+          path: |
+            /ws/opencog/build/*.tar.gz
+            /ws/opencog/build/*.zip
+            /ws/opencog/build/*.deb
+            /ws/opencog/release/cogml-hypergraph.scm
+            /ws/opencog/release/packaging-summary.txt
+          retention-days: 30
+
+      # New: Create GitHub Release for Tagged Versions
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            /ws/opencog/build/*.tar.gz
+            /ws/opencog/build/*.zip
+            /ws/opencog/build/*.deb
+            /ws/opencog/release/cogml-hypergraph.scm
+          generate_release_notes: true
+          draft: false
+          prerelease: false

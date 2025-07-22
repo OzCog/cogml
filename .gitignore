@@ -137,6 +137,7 @@ hardware_matrix_config.h
 # Packaging artifacts
 build-package/
 package-verification-report.txt
+release/
 *.deb
 *.tar.gz
 *.rpm
