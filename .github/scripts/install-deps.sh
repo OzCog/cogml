@@ -52,6 +52,10 @@ install_packages "libboost-all-dev"
 install_packages "python3-nose python3-dev"
 install_packages "valgrind doxygen"
 
+# Install critical dependencies that are often missing
+echo "Installing critical dependencies..."
+install_packages "guile-3.0-dev cython3"
+
 # Install specific packages based on job type
 case "${1:-basic}" in
     "guile")
