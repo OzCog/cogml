@@ -99,9 +99,7 @@ IF (UNIFY_FOUND)
 	ADD_DEFINITIONS(-DHAVE_UNIFY)
 	SET(HAVE_UNIFY 1)
 ELSE (UNIFY_FOUND)
-	MESSAGE(WARNING "Unify missing: proceeding without it for testing!")
-	# MESSAGE(FATAL_ERROR "Unify missing: it is needed!")
-	SET(HAVE_UNIFY 0)
+	MESSAGE(FATAL_ERROR "Unify missing: it is needed!")
 ENDIF (UNIFY_FOUND)
 
 # add the 'cmake' directory from cogutil to search path
@@ -197,9 +195,9 @@ INCLUDE("/usr/local/share/opencog/cmake/OpenCogCython.cmake")
 # ==========================================================
 # Decide what to build, based on the packages found.
 
-IF(HAVE_ATOMSPACE AND HAVE_COGUTIL)
+IF(HAVE_UNIFY AND HAVE_ATOMSPACE AND HAVE_COGUTIL)
 	SET(HAVE_URE 1)
-ENDIF(HAVE_ATOMSPACE AND HAVE_COGUTIL)
+ENDIF(HAVE_UNIFY AND HAVE_ATOMSPACE AND HAVE_COGUTIL)
 
 ADD_SUBDIRECTORY(opencog)
 IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib")
