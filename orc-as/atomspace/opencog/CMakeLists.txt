@@ -27,7 +27,7 @@ ENDIF (HAVE_CYTHON)
 
 # Haskell bindings.
 IF (HAVE_STACK)
-	ADD_SUBDIRECTORY (haskell)
+# ADD_SUBDIRECTORY (haskell) # Disabled due to network issues
 ENDIF (HAVE_STACK)
 
 # OCaml bindings.
