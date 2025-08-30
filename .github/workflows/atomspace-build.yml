@@ -57,6 +57,7 @@ jobs:
           sudo apt-get install -y -q python3-nose valgrind doxygen
 
       - name: Restore cogutil cache
+        id: restore_cogutil
         uses: actions/cache@v3
         with:
           path: orc-dv/cogutil/build
@@ -66,9 +67,22 @@ jobs:
 
       - name: Install cogutil
         run: |
-          cd orc-dv/cogutil/build
-          sudo make install
-          sudo ldconfig
+          # Check if cogutil build exists from cache, if not build from source
+          if [ -d "orc-dv/cogutil/build" ] && [ "$(ls -A orc-dv/cogutil/build 2>/dev/null)" ]; then
+            echo "✅ Using cached cogutil build"
+            cd orc-dv/cogutil/build
+            sudo make install
+            sudo ldconfig
+          else
+            echo "🔨 Cache not available, building cogutil from source"
+            cd orc-dv/cogutil
+            mkdir -p build && cd build
+            cmake .. -DCMAKE_BUILD_TYPE=Release
+            make -j$(nproc)
+            sudo make install
+            sudo ldconfig
+            echo "✅ Cogutil built and installed from source"
+          fi
 
       - name: Build AtomSpace with Self-Healing
         run: |
