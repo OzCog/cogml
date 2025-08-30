@@ -66,9 +66,21 @@ jobs:
 
       - name: Install cogutil
         run: |
-          cd orc-dv/cogutil/build
-          sudo make install
-          sudo ldconfig
+          # Check if cogutil build directory exists from cache
+          if [ -d "orc-dv/cogutil/build" ] && [ -f "orc-dv/cogutil/build/Makefile" ]; then
+            echo "Using cached cogutil build"
+            cd orc-dv/cogutil/build
+            sudo make install
+            sudo ldconfig
+          else
+            echo "Cache not available, building cogutil from source"
+            cd orc-dv/cogutil
+            mkdir -p build && cd build
+            cmake .. -DCMAKE_BUILD_TYPE=Release
+            make -j$(nproc)
+            sudo make install
+            sudo ldconfig
+          fi
 
       - name: Build AtomSpace with Self-Healing
         run: |
