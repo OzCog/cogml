@@ -72,7 +72,13 @@ jobs:
       - name: Setup environment
         run: |
           export PATH="/tmp/deps/miniconda/bin:$PATH"
+          source /tmp/deps/miniconda/etc/profile.d/conda.sh || true
+          export BOOST_ROOT="/tmp/deps/miniconda"
+          export CMAKE_PREFIX_PATH="/tmp/deps/miniconda"
+          conda list | grep boost || conda install -y -c conda-forge boost boost-cpp
           echo "/tmp/deps/miniconda/bin" >> $GITHUB_PATH
+          echo "BOOST_ROOT=/tmp/deps/miniconda" >> $GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=/tmp/deps/miniconda" >> $GITHUB_ENV
           
       - name: Cache cogutil build
         id: cogutil-cache
@@ -88,7 +94,8 @@ jobs:
         run: |
           cd orc-dv/cogutil
           mkdir -p build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ env.INSTALL_PREFIX }}
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ env.INSTALL_PREFIX }} \
+            -DBOOST_ROOT=/tmp/deps/miniconda -DCMAKE_PREFIX_PATH=/tmp/deps/miniconda
           make -j$(nproc)
           make install
           
@@ -110,7 +117,8 @@ jobs:
           echo "# Build compatibility" > lib/CMakeLists.txt
           
           mkdir -p build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ env.INSTALL_PREFIX }}
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ env.INSTALL_PREFIX }} \
+            -DBOOST_ROOT=/tmp/deps/miniconda -DCMAKE_PREFIX_PATH=/tmp/deps/miniconda
           make -j$(nproc)
           make install
           
@@ -153,7 +161,13 @@ jobs:
       - name: Setup environment
         run: |
           export PATH="/tmp/deps/miniconda/bin:$PATH"
+          source /tmp/deps/miniconda/etc/profile.d/conda.sh || true
+          export BOOST_ROOT="/tmp/deps/miniconda"
+          export CMAKE_PREFIX_PATH="/tmp/deps/miniconda"
+          conda list | grep boost || conda install -y -c conda-forge boost boost-cpp
           echo "/tmp/deps/miniconda/bin" >> $GITHUB_PATH
+          echo "BOOST_ROOT=/tmp/deps/miniconda" >> $GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=/tmp/deps/miniconda" >> $GITHUB_ENV
           
       - name: Build unify (if needed)
         if: matrix.component.needs_unify
@@ -162,7 +176,8 @@ jobs:
           git clone --depth 1 https://github.com/opencog/unify /tmp/unify
           cd /tmp/unify
           mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ env.INSTALL_PREFIX }}
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ env.INSTALL_PREFIX }} \
+            -DBOOST_ROOT=/tmp/deps/miniconda -DCMAKE_PREFIX_PATH=/tmp/deps/miniconda
           make -j$(nproc)
           make install
           
@@ -175,7 +190,8 @@ jobs:
           cmake .. \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=${{ env.INSTALL_PREFIX }} \
-            -DCMAKE_PREFIX_PATH=${{ env.INSTALL_PREFIX }}
+            -DCMAKE_PREFIX_PATH=${{ env.INSTALL_PREFIX }} \
+            -DBOOST_ROOT=/tmp/deps/miniconda
             
           make -j$(nproc)
           

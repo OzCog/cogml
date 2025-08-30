@@ -117,7 +117,12 @@ jobs:
           cd orc-ai/ure
           mkdir -p build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE=$(which python3) -DATOMSPACE_DATA_DIR=/usr/local/share/opencog
+#<<<<<<< copilot/fix-164
           make -j$(nproc) || echo "WARNING: Some URE components failed to build (likely Python bindings), but core library built successfully"
+#=======
+          # Build core C++ libraries (skip Python bindings due to Cython compatibility issues)
+          make ure ure-types -j$(nproc)
+#>>>>>>> main
 
       - name: Test URE
         run: |

@@ -30,16 +30,8 @@ jobs:
           
       - name: Install dependencies (optimized)
         run: |
-          # Use faster package manager alternatives when possible to avoid timeouts
-          if command -v apt-fast &> /dev/null; then
-            sudo apt-fast update && sudo apt-fast install -y build-essential cmake libboost-all-dev python3-nose python3-dev valgrind doxygen
-          else
-            # Reduce timeout risk with targeted package installation and shorter timeout
-            timeout 300s sudo apt-get update -q || echo "Update timed out, continuing..."
-            timeout 600s sudo apt-get install -y --no-install-recommends build-essential cmake || echo "Basic tools install had issues"
-            timeout 600s sudo apt-get install -y --no-install-recommends libboost-all-dev python3-nose python3-dev || echo "Dev tools install had issues"
-            timeout 300s sudo apt-get install -y --no-install-recommends valgrind doxygen || echo "Optional tools install had issues"
-          fi
+          # Use the centralized dependency installation script
+          ./.github/scripts/install-deps.sh basic
           
       - name: Build cogutil
         run: |
@@ -75,13 +67,7 @@ jobs:
           fetch-depth: 0  # Fetch full git history for versioning
       
       - name: Install dependencies
-        run: |
-          # Install packages in smaller chunks to prevent timeout
-          sudo apt-get update -q
-          sudo apt-get install -y -q build-essential cmake
-          sudo apt-get install -y -q libboost-all-dev
-          sudo apt-get install -y -q guile-3.0-dev cython3
-          sudo apt-get install -y -q python3-nose python3-dev valgrind doxygen
+        run: ./.github/scripts/install-deps.sh guile
           
       - name: Restore cogutil cache
         uses: actions/cache@v3
@@ -571,7 +557,12 @@ jobs:
           cd orc-ai/ure
           mkdir -p build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE=$(which python3) -DATOMSPACE_DATA_DIR=/usr/local/share/opencog
+#<<<<<<< copilot/fix-164
           make -j$(nproc) || echo "WARNING: Some URE components failed to build (likely Python bindings), but core library built successfully"
+#=======
+          # Build core C++ libraries (skip Python bindings due to Cython compatibility issues)
+#          make ure ure-types -j$(nproc)
+#>>>>>>> main
           
       - name: Test URE
         run: |
@@ -581,7 +572,10 @@ jobs:
       - name: Install URE
         run: |
           cd orc-ai/ure/build
-          sudo make install
+          # Install core URE libraries manually
+          sudo mkdir -p /usr/local/lib/opencog
+          sudo cp ./opencog/ure/libure.so /usr/local/lib/opencog/
+          sudo cp ./opencog/ure/types/libure-types.so /usr/local/lib/opencog/
           sudo ldconfig
           
       - name: Cache ure build
@@ -1274,12 +1268,16 @@ jobs:
           endif()
           EOF
           
-      - name: Build and install cogserver
+      - name: Build CogServer
         run: |
           cd orc-sv/cogserver
           mkdir -p build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DATOMSPACE_DATA_DIR=/usr/local/share/opencog
           make -j$(nproc)
+          
+      - name: Install CogServer
+        run: |
+          cd orc-sv/cogserver/build
           sudo make install
           sudo ldconfig
           
