@@ -41,14 +41,42 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
+          echo "📦 Installing build dependencies..."
           sudo apt-get install -y build-essential cmake libboost-all-dev python3-nose valgrind doxygen
+          
+          echo "✅ Verifying installations..."
+          cmake --version
+          gcc --version
+          dpkg -l | grep libboost-dev || echo "⚠️  Boost dev package check failed"
+          
+          echo "📋 Boost library detection:"
+          find /usr -name "*boost*" -type d 2>/dev/null | head -5 || true
 
       - name: Build cogutil
         run: |
           cd orc-dv/cogutil
           mkdir -p build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
-          make -j$(nproc)
+          
+          echo "🔧 Configuring cogutil build..."
+          if ! cmake .. -DCMAKE_BUILD_TYPE=Release; then
+            echo "❌ CMake configuration failed"
+            echo "📋 System information:"
+            cmake --version
+            gcc --version
+            echo "📦 Available packages:"
+            dpkg -l | grep -E "(boost|cmake)" || true
+            exit 1
+          fi
+          
+          echo "🔨 Building cogutil..."
+          if ! make -j$(nproc); then
+            echo "❌ Build failed"
+            echo "📋 Build log tail:"
+            tail -n 50 CMakeFiles/CMakeError.log || true
+            exit 1
+          fi
+          
+          echo "✅ Cogutil build completed successfully"
 
       - name: Test cogutil
         run: |
@@ -63,6 +91,7 @@ jobs:
 
       - name: Cache cogutil build
         uses: actions/cache@v3
+        if: always()  # Cache even if previous steps had issues
         with:
           path: orc-dv/cogutil/build
           key: ${{ steps.cache_info.outputs.key }}

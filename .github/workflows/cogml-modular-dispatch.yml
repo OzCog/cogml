@@ -37,11 +37,11 @@ jobs:
 
   # ==== Core Layer ====
   atomspace:
-    if: contains(github.event.inputs.job_selection, 'atomspace') || github.event.inputs.job_selection == 'all' || github.event.inputs.job_selection == ''
+    if: (contains(github.event.inputs.job_selection, 'atomspace') || github.event.inputs.job_selection == 'all' || github.event.inputs.job_selection == '') && (success() || failure())
     needs: [cogutil]
     uses: ./.github/workflows/atomspace-build.yml
     with:
-      cogutil_cache_key: ${{ needs.cogutil.outputs.cache_key }}
+      cogutil_cache_key: ${{ needs.cogutil.outputs.cache_key || '' }}
       cache_key_suffix: ${{ github.event.inputs.cache_key_suffix || 'default' }}
 
   atomspace-rocks:
@@ -72,12 +72,12 @@ jobs:
 
   # ==== Logic Layer ====
   ure:
-    if: contains(github.event.inputs.job_selection, 'ure') || github.event.inputs.job_selection == 'all' || github.event.inputs.job_selection == ''
+    if: (contains(github.event.inputs.job_selection, 'ure') || github.event.inputs.job_selection == 'all' || github.event.inputs.job_selection == '') && (success() || failure())
     needs: [cogutil, atomspace]
     uses: ./.github/workflows/ure-build.yml
     with:
-      cogutil_cache_key: ${{ needs.cogutil.outputs.cache_key }}
-      atomspace_cache_key: ${{ needs.atomspace.outputs.cache_key }}
+      cogutil_cache_key: ${{ needs.cogutil.outputs.cache_key || '' }}
+      atomspace_cache_key: ${{ needs.atomspace.outputs.cache_key || '' }}
       cache_key_suffix: ${{ github.event.inputs.cache_key_suffix || 'default' }}
 
   pln:
@@ -105,11 +105,11 @@ jobs:
 
   # ==== Learning Layer ====
   moses:
-    if: contains(github.event.inputs.job_selection, 'moses') || github.event.inputs.job_selection == 'all' || github.event.inputs.job_selection == ''
+    if: (contains(github.event.inputs.job_selection, 'moses') || github.event.inputs.job_selection == 'all' || github.event.inputs.job_selection == '') && (success() || failure())
     needs: [cogutil]
     uses: ./.github/workflows/moses-build.yml
     with:
-      cogutil_cache_key: ${{ needs.cogutil.outputs.cache_key }}
+      cogutil_cache_key: ${{ needs.cogutil.outputs.cache_key || '' }}
       cache_key_suffix: ${{ github.event.inputs.cache_key_suffix || 'default' }}
 
   asmoses:
@@ -127,12 +127,12 @@ jobs:
 
   # ==== Server Layer ====
   cogserver:
-    if: contains(github.event.inputs.job_selection, 'cogserver') || github.event.inputs.job_selection == 'all' || github.event.inputs.job_selection == ''
+    if: (contains(github.event.inputs.job_selection, 'cogserver') || github.event.inputs.job_selection == 'all' || github.event.inputs.job_selection == '') && (success() || failure())
     needs: [cogutil, atomspace]
     uses: ./.github/workflows/cogserver-build.yml
     with:
-      cogutil_cache_key: ${{ needs.cogutil.outputs.cache_key }}
-      atomspace_cache_key: ${{ needs.atomspace.outputs.cache_key }}
+      cogutil_cache_key: ${{ needs.cogutil.outputs.cache_key || '' }}
+      atomspace_cache_key: ${{ needs.atomspace.outputs.cache_key || '' }}
       cache_key_suffix: ${{ github.event.inputs.cache_key_suffix || 'default' }}
 
   # ==== Learning Module ====

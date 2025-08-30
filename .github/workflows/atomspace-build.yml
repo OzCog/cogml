@@ -57,43 +57,60 @@ jobs:
           sudo apt-get install -y -q python3-nose valgrind doxygen
 
       - name: Restore cogutil cache
+        id: restore_cogutil
         uses: actions/cache@v3
         with:
           path: orc-dv/cogutil/build
           key: ${{ inputs.cogutil_cache_key || format('cogutil-{0}-{1}-{2}', runner.os, github.sha, inputs.cache_key_suffix) }}
           restore-keys: |
+            cogutil-${{ runner.os }}-${{ github.sha }}-
             cogutil-${{ runner.os }}-
+            cogutil-
 
       - name: Install cogutil
         run: |
-          # Check if cogutil build directory exists from cache
-          if [ -d "orc-dv/cogutil/build" ] && [ -f "orc-dv/cogutil/build/Makefile" ]; then
-            echo "Using cached cogutil build"
+          # Check if cogutil build exists from cache, if not build from source
+          if [ -d "orc-dv/cogutil/build" ] && [ "$(ls -A orc-dv/cogutil/build 2>/dev/null)" ]; then
+            echo "✅ Using cached cogutil build"
             cd orc-dv/cogutil/build
             sudo make install
             sudo ldconfig
           else
-            echo "Cache not available, building cogutil from source"
+            echo "🔨 Cache not available, building cogutil from source"
             cd orc-dv/cogutil
             mkdir -p build && cd build
             cmake .. -DCMAKE_BUILD_TYPE=Release
             make -j$(nproc)
             sudo make install
             sudo ldconfig
+            echo "✅ Cogutil built and installed from source"
           fi
 
       - name: Build AtomSpace with Self-Healing
         run: |
           cd orc-as/atomspace
+          
+          echo "🔧 Preparing AtomSpace build environment..."
           # Create missing lib directory if it doesn't exist
           if [ ! -d "lib" ]; then
             mkdir -p lib
             echo "# Empty lib directory for build compatibility" > lib/CMakeLists.txt
+            echo "📁 Created missing lib directory"
           fi
+          
           mkdir -p build && cd build
+          echo "📋 Build environment information:"
+          echo "Working directory: $(pwd)"
+          echo "CMake version: $(cmake --version | head -1)"
+          echo "GCC version: $(gcc --version | head -1)"
+          
+          echo "🔍 Checking for installed dependencies:"
+          pkg-config --exists cogutil && echo "✅ cogutil found" || echo "❌ cogutil not found"
+          dpkg -l | grep libboost-dev > /dev/null && echo "✅ boost dev found" || echo "❌ boost dev not found"
 
           # First attempt - try normal build
-          if cmake .. -DCMAKE_BUILD_TYPE=Release && make -j$(nproc); then
+          echo "🔨 Starting AtomSpace build (attempt 1)..."
+          if cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON && make -j$(nproc); then
             echo "✅ AtomSpace build successful on first try!"
           else
             echo "❌ AtomSpace build failed, activating self-healing..."
@@ -113,10 +130,18 @@ jobs:
                 echo "✅ Self-healing resolved the build issues!"
               else
                 echo "🚨 Self-healing could not resolve issues, manual intervention required"
+                echo "📋 CMake error log:"
+                cat orc-as/atomspace/build/CMakeFiles/CMakeError.log || true
+                echo "📋 Make error output:"
+                tail -n 100 orc-as/atomspace/build/CMakeFiles/CMakeOutput.log || true
                 exit 1
               fi
             else
               echo "⚠️  Self-healing disabled or unavailable, failing build"
+              echo "📋 Available files in repo root:"
+              ls -la scripts/ || echo "No scripts directory found"
+              echo "📋 CMake configuration output:"
+              cat CMakeFiles/CMakeError.log || echo "No CMake error log found"
               exit 1
             fi
           fi
