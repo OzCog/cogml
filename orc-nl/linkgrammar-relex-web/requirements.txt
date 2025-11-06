@@ -1,4 +1,4 @@
-Django==4.2.25
+Django==4.2.26
 argparse==1.2.1
 distribute==0.7.3
 dj-database-url==0.2.2
