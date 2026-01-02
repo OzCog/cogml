@@ -79,7 +79,7 @@ jobs:
           sudo ldconfig
 
           # Build and install atomspace
-          cd ../../orc-as/atomspace
+          cd ../../../orc-as/atomspace
           if [ ! -d "lib" ]; then
             mkdir -p lib
             echo "# Empty lib directory for build compatibility" > lib/CMakeLists.txt
