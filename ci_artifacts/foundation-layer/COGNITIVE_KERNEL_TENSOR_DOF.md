@@ -1,6 +1,6 @@
 # Cognitive Kernel: Tensor Degrees of Freedom
 
-**Generated**: 2026-01-04T21:40:32+00:00
+**Generated**: 2026-01-04T21:42:00+00:00
 **Build Configuration**: [modules, build-steps, tests]
 
 ## Overview
@@ -16,15 +16,15 @@ The Cognitive Kernel implements recursive tensor operations across four primary 
 
 ### CogUtil - Core Utilities
 
-**Location**: 
+**Location**: `orc-dv/cogutil`
 **Languages**: C++, Scheme
 **Build System**: CMake
 
 **Tensor Degrees of Freedom**:
-- Spatial: 3D coordinate transformations 
-- Temporal: Time-indexed sequences 
-- Semantic: 256D concept embeddings 
-- Logical: 64D inference states 
+- Spatial: 3D coordinate transformations [x, y, z]
+- Temporal: Time-indexed sequences [t]
+- Semantic: 256D concept embeddings [s1...s256]
+- Logical: 64D inference states [l1...l64]
 
 **Recursive Features**:
 - Recursive data structure traversal (trees, graphs)
@@ -37,7 +37,7 @@ The Cognitive Kernel implements recursive tensor operations across four primary 
 
 ### Moses - Meta-Optimizing Semantic Evolutionary Search
 
-**Location**: 
+**Location**: `orc-ai/moses`
 **Languages**: C++, Scheme
 **Build System**: CMake
 
@@ -58,7 +58,7 @@ The Cognitive Kernel implements recursive tensor operations across four primary 
 
 ### External-Tools - Integration Layer
 
-**Location**: 
+**Location**: `orc-dv/external-tools`
 **Languages**: Python, Java, Scheme, Multiple
 **Build System**: Mixed (pip, maven, custom)
 
@@ -79,7 +79,7 @@ The Cognitive Kernel implements recursive tensor operations across four primary 
 
 ### Rust Crates - High-Performance Operations
 
-**Location**: 
+**Location**: `orc-dv/rust_crates`
 **Languages**: Rust
 **Build System**: Cargo
 
@@ -100,7 +100,14 @@ The Cognitive Kernel implements recursive tensor operations across four primary 
 
 ## Cross-Module Tensor Flow
 
-
+```
+CogUtil → Moses → External-Tools → Rust Crates
+   ↓        ↓          ↓             ↓
+Spatial  Spatial   Spatial      Spatial (3D)
+Temporal Temporal  Temporal     Temporal (1D)
+Semantic Semantic  Semantic     Semantic (256D)
+Logical  Logical   Logical      Logical (64D)
+```
 
 ## Hardware Matrix
 
@@ -116,27 +123,6 @@ The Cognitive Kernel implements recursive tensor operations across four primary 
 - **CPU Backend**: Optimized for general-purpose computing
 - **GPU Backend**: CUDA/OpenCL for parallel tensor operations
 - **Hybrid**: Dynamic backend selection based on tensor size
-
-## Artifact Structure
-
-
-
-## Recursive Implementation Validation
-
-All cognitive operations implement genuine recursion:
-
-1. **Recursive Decomposition**: Complex tensors → sub-tensors
-2. **Recursive Composition**: Components → complex tensors
-3. **Recursive Transformation**: Nested cognitive transformations
-4. **Recursive Validation**: Multi-level tensor validation
-
-## Build Parameterization
-
-**Tensor Shape**: 
-
-- **Modules**: 
-- **Build Steps**: 
-- **Tests**: 
 
 ## Conclusion
 
