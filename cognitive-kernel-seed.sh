@@ -150,7 +150,7 @@ generate_documentation() {
     
     local doc_file="$ARTIFACTS_DIR/COGNITIVE_KERNEL_TENSOR_DOF.md"
     
-    cat > "$doc_file" << 'EOF'
+    cat > "$doc_file" << EOF
 # Cognitive Kernel: Tensor Degrees of Freedom
 
 **Generated**: $(date -Iseconds)
