@@ -1,6 +1,6 @@
 {
     "cognitive_kernel_seed": {
-        "timestamp": "2026-01-04T21:27:21+00:00",
+        "timestamp": "2026-01-04T21:37:02+00:00",
         "version": "1.0.0",
         "status": "seeded",
         "foundation_layer": {
@@ -17,12 +17,12 @@
                 "shape": "[modules, build-steps, tests]"
             },
             "ggml_configuration": {
-                "enabled": ON,
+                "enabled": true,
                 "backend": "cpu,gpu",
                 "precision": "fp32,fp16"
             },
             "hardware_matrix": {
-                "multi_arch_enabled": ON,
+                "multi_arch_enabled": true,
                 "target_architectures": "x86_64,arm64,riscv64"
             },
             "tensor_degrees_of_freedom": {

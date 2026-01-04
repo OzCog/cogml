@@ -457,12 +457,12 @@ generate_seed_report() {
                 "shape": "[modules, build-steps, tests]"
             },
             "ggml_configuration": {
-                "enabled": $GGML_SUPPORT,
+                "enabled": $([ "$GGML_SUPPORT" = "ON" ] && echo "true" || echo "false"),
                 "backend": "$GGML_BACKEND",
                 "precision": "$TENSOR_PRECISION"
             },
             "hardware_matrix": {
-                "multi_arch_enabled": $ENABLE_MULTIARCH,
+                "multi_arch_enabled": $([ "$ENABLE_MULTIARCH" = "ON" ] && echo "true" || echo "false"),
                 "target_architectures": "$TARGET_ARCHS"
             },
             "tensor_degrees_of_freedom": {
