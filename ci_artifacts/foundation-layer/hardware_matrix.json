@@ -1,0 +1,25 @@
+{
+    "hardware_matrix": {
+        "timestamp": "2026-01-04T21:40:32+00:00",
+        "detected_architecture": "x86_64",
+        "cpu_features": "avx,avx2,misalignsse,sse,sse2,sse4_1,sse4_2,sse4a,ssse3",
+        "gpu_detected": false,
+        "gpu_info": "none",
+        "tensor_acceleration": {
+            "avx2": true,
+            "avx512": false,
+            "neon": false,
+            "cuda": false
+        },
+        "supported_backends": {
+            "cpu": true,
+            "gpu": false,
+            "hybrid": false
+        },
+        "multi_arch_support": {
+            "x86_64": true,
+            "aarch64": false,
+            "riscv64": false
+        }
+    }
+}

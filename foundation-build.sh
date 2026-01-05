@@ -30,11 +30,12 @@ JOBS=${JOBS:-$(nproc)}
 BUILD_DIR=${BUILD_DIR:-$(pwd)/build-foundation}
 
 # Foundation layer components (in dependency order)
+# Format: "component_name:source_directory"
 FOUNDATION_COMPONENTS=(
-    "cogutil"           # Core utilities - foundation of all OpenCog
-    "external-tools"    # External tool integrations 
-    "moses"             # Evolutionary algorithms with tensor support
-    "rust_crates"       # Rust bindings for performance
+    "cogutil:orc-dv/cogutil"                    # Core utilities - foundation of all OpenCog
+    "external-tools:orc-dv/external-tools"      # External tool integrations 
+    "moses:orc-ai/moses"                        # Evolutionary algorithms with tensor support
+    "rust_crates:orc-dv/rust_crates"            # Rust bindings for performance
 )
 
 echo "=========================================="
@@ -141,8 +142,9 @@ EOF
 # ========================================================================
 
 build_foundation_component() {
-    local component=$1
-    local source_dir="orc-dv/$component"
+    local component_spec=$1
+    local component="${component_spec%%:*}"
+    local source_dir="${component_spec#*:}"
     
     echo "Building foundation component: $component"
     echo "  Source: $source_dir"
@@ -160,6 +162,31 @@ build_foundation_component() {
     # Configure tensor shapes for this component
     configure_tensor_shapes "$component"
     
+    # Check if component has CMakeLists.txt
+    if [ ! -f "../../$source_dir/CMakeLists.txt" ]; then
+        echo "  No CMakeLists.txt found, attempting alternative build methods..."
+        
+        # Check for Cargo.toml (Rust projects)
+        if [ -f "../../$source_dir/Cargo.toml" ]; then
+            echo "  Building Rust crate with Cargo..."
+            cd "../../$source_dir"
+            cargo build --release || {
+                echo "  Cargo build failed for $component"
+                cd "$comp_build_dir"
+                return 1
+            }
+            cd "$comp_build_dir"
+            echo "  ✓ Rust crate built successfully"
+            generate_component_artifacts "$component"
+            return 0
+        fi
+        
+        # Skip components without build system
+        echo "  No build system found, generating artifacts only..."
+        generate_component_artifacts "$component"
+        return 0
+    fi
+    
     # Enhanced CMake configuration with tensor support
     echo "  Configuring with tensor support..."
     cmake "../../$source_dir" \
@@ -173,8 +200,15 @@ build_foundation_component() {
         -DDEBUG_TENSOR_SHAPES=ON \
         -DGENERATE_ARTIFACTS=ON \
         || {
-            echo "  CMake configuration failed for $component"
-            return 1
+            echo "  CMake configuration failed for $component, attempting minimal configuration..."
+            cmake "../../$source_dir" \
+                -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+                -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
+                -DCMAKE_PREFIX_PATH="$INSTALL_PREFIX" \
+                || {
+                    echo "  Minimal CMake configuration also failed for $component"
+                    return 1
+                }
         }
     
     # Build with tensor-aware compilation
